@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SelectoVintage</title>
+</head>
+<style>
+    body.menu-open {
+        overflow: hidden;
+        /* Desactiva el desplazamiento del cuerpo */
+    }
+
+    body.menu-open nav,
+    body.menu-open .overlay {
+        pointer-events: auto;
+        /* Permite eventos de puntero en el menú y la overlay */
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    #sizes {
+        display: none;
+    }
+
+    #sizes.show {
+        display: block;
+    }
+
+    #sizes-menu {
+        display: none;
+        /* Puedes ajustar este estilo para darle un diseño más atractivo */
+    }
+
+    #sizes-menu button {
+        display: block;
+        width: 100%;
+        margin: 10px 0;
+        padding: 10px;
+        font-size: 18px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        cursor: pointer;
+    }
+
+    header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        z-index: 9000;
+        position: relative;
+    }
+
+    .menu-icon {
+        cursor: pointer;
+    }
+
+    .menu-icon img {
+        width: 35px;
+    }
+
+    h1 {
+        font-family: 'Georgia', serif;
+        font-size: 24px;
+        margin: 0;
+        text-align: center;
+        flex-grow: 1;
+    }
+
+    nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 50%;
+        height: 100%;
+        background-color: #ccc;
+        box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        z-index: 999;
+        opacity: 0;
+    }
+
+    .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 998;
+        display: none;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    .overlay.active {
+        display: block;
+        opacity: 1;
+    }
+
+    nav.show {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    nav ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    nav ul li {
+        margin-bottom: 20px;
+    }
+
+    nav ul li a {
+        text-decoration: none;
+        /* Eliminar subrayado */
+        color: #333;
+        /* Color de texto */
+        display: flex;
+        /* Flexbox para alinear los elementos */
+        justify-content: space-between;
+        /* Distribuir espacio entre texto y símbolo */
+        align-items: center;
+        /* Alinear verticalmente el contenido */
+    }
+
+    nav .arrow {
+        font-size: 20px;
+        /* Tamaño del símbolo */
+        color: #333;
+        /* Color del símbolo */
+    }
+
+    .carousel {
+        position: relative;
+        width: 100%;
+        overflow: hidden;
+        margin-top: 0px;
+    }
+
+    .carousel-images {
+        display: flex;
+        width: 300%;
+        transition: transform 0.5s ease;
+    }
+
+    .carousel-images img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+    }
+
+    .carousel-buttons {
+        position: absolute;
+        top: 50%;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        transform: translateY(-50%);
+    }
+
+    .carousel-buttons button {
+        background: none;
+        border: none;
+        font-size: 2em;
+        cursor: pointer;
+        color: #fff;
+    }
+
+    .buttons {
+        display: flex;
+        justify-content: space-around;
+        margin: 20px 0;
+    }
+
+    .buttons button {
+        background-color: #000;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .latest-arrivals {
+        padding: 20px;
+    }
+
+    .latest-arrivals h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .items {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+    }
+
+    .items .item {
+        width: 48%;
+        margin-bottom: 20px;
+    }
+
+    .items .item img {
+        width: 100%;
+        height: auto;
+        border-radius: 3px;
+    }
+
+    .add-to-cart {
+        justify-content: center;
+        text-align: center;
+        border: 2px solid #000000c1;
+        margin-left: 0%;
+        background-color: #fff;
+        padding: 15px;
+        width: 100%;
+        font-weight: bold;
+        color: #000;
+        font-size: 14px;
+        border-radius: 3px;
+    }
+
+    .txt-carrete {
+        background-color: #a2969679;
+        text-align: center;
+        padding: 8px;
+        font-weight: bold;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .txt-carrete a {
+        margin: 0 15px;
+    }
+
+    .text-nav {
+        background: none;
+        border: none;
+        font-size: 1.5em;
+        cursor: pointer;
+        color: #000;
+    }
+
+    @media (min-width: 601px) and (max-width: 1024px) {
+        .items .item {
+            width: 48%;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .carousel-images img {
+            height: 300px;
+        }
+
+        .items .item {
+            width: 48%;
+        }
+    }
+
+    @media (min-width: 1025px) {
+        .items .item {
+            width: 23%;
+        }
+    }
+</style>
+
+<body>
+    <header>
+        <div class="menu-icon" onclick="toggleMenu()">
+            <img src="icono.png" alt="Menu">
+        </div>
+        <h1>ABG VINTAGE</h1>
+        <div class="menu-icon" style="margin-left: 0%; margin-right: 3%;">
+            <img src="cesta.png" alt="Menu">
+        </div>
+    </header>
+    <div class="txt-carrete">
+        <button class="text-nav" onclick="prevText()" style="display: none;">❮</button>
+        <a id="text-carousel"></a>
+        <button class="text-nav" onclick="nextText()" style="display: none;">❯</button>
+    </div>
+    <div class="overlay"></div>
+    <nav id="menu" class="hidden">
+        <br>
+        <br>
+        <br>
+        <ul id="SearchCategory"></ul>
+    </nav>
+
+    <nav id="sizes" class="hidden">
+        <br>
+        <br>
+        <br>
+        <ul>
+            <li><a href="#" onclick="backToMenu()"><span class="arrow">❮ <b>Volver</b></span></a></li>
+        </ul>
+        <ul id="SearchTallas"></ul>
+    </nav>
+
+    <main>
+        <section id="CarouselImg">
+
+            <section class="carousel">
+                <div class="carousel-images">
+                    <img src="">
+                    <img src="">
+                    <img src="">
+                </div>
+            </section>
+
+            <section class="buttons" id="btns">
+                <button>Ver Novedades</button>
+                <button>Mistery Box</button>
+                <button>Outlet</button>
+            </section>
+
+        </section>
+
+        <section class="latest-arrivals" id="Setion-ProductosIds">
+            <h2 style="text-align: left;" id="Setion-ProductoId">Lo Último en Llegar</h2>
+            <div class="items" id="items-container">
+                <!-- Los productos filtrados se añadirán aquí dinámicamente -->
+            </div>
+            <section class="buttons">
+                <button>Ver todo</button>
+            </section>
+        </section>
+    </main>
+
+    <script>
+        let currentImageIndex = 0;
+
+        function toggleMenu() {
+            const menu = document.getElementById('menu');
+            const overlay = document.querySelector('.overlay');
+            const body = document.body;
+            const sizes = document.getElementById('sizes');
+
+            if (menu.classList.contains('show')) {
+                menu.classList.remove('show');
+                overlay.classList.remove('active');
+                setTimeout(() => {
+                    menu.classList.add('hidden');
+                    body.classList.remove('menu-open');
+                    sizes.classList.remove('show');
+                }, 300);
+            } else {
+                menu.classList.remove('hidden');
+                setTimeout(() => {
+                    menu.classList.add('show');
+                    overlay.classList.add('active');
+                    body.classList.add('menu-open');
+                }, 10);
+            }
+        }
+
+        function showSizes() {
+            document.getElementById('menu').classList.add('hidden');
+            document.getElementById('sizes').classList.add('show');
+        }
+
+        function backToMenu() {
+            document.getElementById('sizes').classList.remove('show');
+            document.getElementById('menu').classList.remove('hidden');
+        }
+
+        function showImage(index) {
+            const carouselImages = document.querySelector('.carousel-images');
+            const totalImages = document.querySelectorAll('.carousel-images img').length;
+            currentImageIndex = (index + totalImages) % totalImages;
+            const offset = -currentImageIndex * (100 / totalImages);
+            carouselImages.style.transform = `translateX(${offset}%)`;
+        }
+
+        function prevImage() {
+            showImage(currentImageIndex - 1);
+        }
+
+        function nextImage() {
+            showImage(currentImageIndex + 1);
+        }
+
+        function showText(index) {
+            currentTextIndex = (index + texts.length) % texts.length;
+            document.getElementById('text-carousel').textContent = texts[currentTextIndex];
+        }
+
+        function prevText() {
+            showText(currentTextIndex - 1);
+        }
+
+        function nextText() {
+            showText(currentTextIndex + 1);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            showImage(currentImageIndex);
+            showText(currentTextIndex);
+            setInterval(() => {
+                nextImage();
+            }, 3000);
+            setInterval(() => {
+                nextText();
+            }, 6000);
+
+            const overlay = document.querySelector('.overlay');
+            overlay.addEventListener('click', toggleMenu);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const overlay = document.querySelector('.overlay');
+            overlay.addEventListener('click', () => {
+                toggleMenu();
+                document.querySelector('.carrusel').classList.remove('show');
+                document.querySelector('.buttons').classList.remove('show');
+            });
+        });
+
+        async function loadTallasByCategoria(categoria) {
+            try {
+                const snapshot = await get(productosRef);
+                if (snapshot.exists()) {
+                    const productos = snapshot.val();
+                    const tallasSet = new Set();
+
+                    for (const key in productos) {
+                        const producto = productos[key];
+                        if (producto.Categoria === categoria) {
+                            const tallas = producto.Talla.split('-');
+                            tallas.forEach(talla => tallasSet.add(talla));
+                        }
+                    }
+
+                    return Array.from(tallasSet).sort();
+                } else {
+                    console.log("No data available");
+                    return [];
+                }
+            } catch (error) {
+                console.error("Error fetching productos: ", error);
+                return [];
+            }
+        }
+
+        // Mostrar tallas
+        window.showSizes = async function (categoria) {
+            console.log(`Loading sizes for category: ${categoria}`);
+            const tallas = await loadTallasByCategoria(categoria);
+            console.log(`Sizes loaded: ${tallas}`);
+            searchTallas.innerHTML = '';
+
+            tallas.forEach(talla => {
+                const li = document.createElement('li');
+                li.textContent = talla;
+                li.onclick = () => {
+                    showProducts(categoria, talla);
+                    document.querySelector('.carrusel').classList.remove('show');
+                    document.querySelector('.buttons').classList.remove('show');
+                };
+                searchTallas.appendChild(li);
+            });
+
+            document.getElementById('menu').classList.add('hidden');
+            document.getElementById('sizes').classList.add('show');
+        };
+
+        // Mostrar productos por categoría y talla
+        async function showProducts(categoria, talla) {
+            try {
+                const snapshot = await get(productosRef);
+                if (snapshot.exists()) {
+                    const productos = snapshot.val();
+                    sectionProductos.innerHTML = '';
+                    sectionProductoId.textContent = categoria;
+
+                    for (const key in productos) {
+                        const producto = productos[key];
+                        if (producto.Categoria === categoria && producto.Talla.includes(talla)) {
+                            const itemDiv = document.createElement('div');
+                            itemDiv.className = 'item';
+
+                            // Obtener la imagen principal
+                            const mainImage = producto.Fotos.Item ? producto.Fotos.Item["Foto 1"] : "default-image-url";
+                            const altImage = producto.Fotos.Item ? producto.Fotos.Item["Foto 2"] : "default-image-url";
+
+                            const img = document.createElement('img');
+                            img.src = mainImage;
+                            img.alt = producto.Categoria;
+                            img.dataset.foto1 = mainImage;
+                            img.dataset.foto2 = altImage;
+                            img.onclick = () => toggleImage(img);
+
+                            const itemInfo = document.createElement('div');
+                            itemInfo.className = 'item-info';
+
+                            const itemName = document.createElement('p');
+                            itemName.className = 'item-name';
+                            itemName.textContent = key;  // Mostrar el nombre del producto
+
+                            const itemPrice = document.createElement('p');
+                            itemPrice.className = 'item-price';
+                            itemPrice.textContent = `${producto.Precio}€`;
+
+                            const addToCartButton = document.createElement('button');
+                            addToCartButton.className = 'add-to-cart';
+                            addToCartButton.textContent = 'Añadir al carrito';
+
+                            itemInfo.appendChild(itemName);
+                            itemInfo.appendChild(itemPrice);
+                            itemInfo.appendChild(addToCartButton);
+
+                            itemDiv.appendChild(img);
+                            itemDiv.appendChild(itemInfo);
+
+                            sectionProductos.appendChild(itemDiv);
+                        }
+                    }
+                } else {
+                    console.log("No data available");
+                }
+            } catch (error) {
+                console.error("Error fetching productos: ", error);
+            }
+        }
+
+        // Cambiar imagen al hacer clic
+        function toggleImage(imgElement) {
+            const foto1 = imgElement.dataset.foto1;
+            const foto2 = imgElement.dataset.foto2;
+            imgElement.src = imgElement.src === foto1 ? foto2 : foto1;
+        }
+
+    </script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDXXwtUl2JS2_lmuhJ4lzKhFCqmy16k8uY",
+        authDomain: "abgvintage-98328.firebaseapp.com",
+        databaseURL: "https://abgvintage-98328-default-rtdb.europe-west1.firebasedatabase.app/",
+        projectId: "abgvintage-98328",
+        storageBucket: "abgvintage-98328.appspot.com",
+        messagingSenderId: "255035853600",
+        appId: "1:255035853600:web:71fa026610e380d0d32545",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const searchCategory = document.getElementById('SearchCategory');
+    const searchTallas = document.getElementById('SearchTallas');
+    const sectionProductos = document.getElementById('items-container');
+    const sectionProductoId = document.getElementById('Setion-ProductoId');
+    const textCarouselContainer = document.getElementById('text-carousel');
+
+    const categoriesRef = ref(db, 'Categorias');
+    const productosRef = ref(db, 'Productos');
+    const anunciosRef = ref(db, 'Anuncios');
+
+    let texts = [];
+    let currentTextIndex = 0;
+
+    // Función para mostrar el texto del carrusel
+    function showText(index) {
+        if (texts.length > 0) {
+            currentTextIndex = (index + texts.length) % texts.length;
+            textCarouselContainer.textContent = texts[currentTextIndex];
+        }
+    }
+
+    function nextText() {
+        showText(currentTextIndex + 1);
+    }
+
+    // Cargar textos del carrusel desde Firebase
+    async function loadTextCarousel() {
+        try {
+            const snapshot = await get(anunciosRef);
+            if (snapshot.exists()) {
+                const anuncios = snapshot.val();
+                texts = Object.values(anuncios); // Asumiendo que 'anuncios' es un objeto de textos
+                if (texts.length > 0) {
+                    showText(currentTextIndex);
+                    setInterval(() => {
+                        nextText();
+                    }, 6000);
+                } else {
+                    console.log("No hay textos disponibles para el carrusel.");
+                }
+            } else {
+                console.log("No hay datos disponibles en 'Anuncios'.");
+            }
+        } catch (error) {
+            console.error("Error fetching anuncios: ", error);
+        }
+    }
+
+    // Inicialización al cargar la página
+    document.addEventListener('DOMContentLoaded', () => {
+        loadTextCarousel();
+
+        // Función para mostrar imagen del carrusel
+        let currentImageIndex = 0;
+        function showImage(index) {
+            const carouselImages = document.querySelector('.carousel-images');
+            const totalImages = document.querySelectorAll('.carousel-images img').length;
+            currentImageIndex = (index + totalImages) % totalImages;
+            const offset = -currentImageIndex * (100 / totalImages);
+            carouselImages.style.transform = `translateX(${offset}%)`;
+        }
+
+        function nextImage() {
+            showImage(currentImageIndex + 1);
+        }
+
+        setInterval(() => {
+            nextImage();
+        }, 3000);
+
+        // Cargar categorías
+        get(categoriesRef).then((snapshot) => {
+            if (snapshot.exists()) {
+                const categories = snapshot.val();
+                for (const key in categories) {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<a onclick="showSizes('${categories[key]}')">${categories[key]} <span class="arrow">❯</span> </a>`;
+                    searchCategory.appendChild(li);
+                }
+            } else {
+                console.log("No data available");
+            }
+        }).catch((error) => {
+            console.error("Error fetching categories: ", error);
+        });
+    });
+
+    // Cargar tallas por categoría
+    async function loadTallasByCategoria(categoria) {
+        try {
+            const snapshot = await get(productosRef);
+            if (snapshot.exists()) {
+                const productos = snapshot.val();
+                const tallasSet = new Set();
+
+                for (const key in productos) {
+                    const producto = productos[key];
+                    if (producto.Categoria === categoria) {
+                        const tallas = producto.Talla.split('-');
+                        tallas.forEach(talla => tallasSet.add(talla));
+                    }
+                }
+
+                return Array.from(tallasSet).sort();
+            } else {
+                console.log("No data available");
+                return [];
+            }
+        } catch (error) {
+            console.error("Error fetching productos: ", error);
+            return [];
+        }
+    }
+
+    // Mostrar tallas
+    window.showSizes = async function (categoria) {
+        console.log(`Loading sizes for category: ${categoria}`);
+        const tallas = await loadTallasByCategoria(categoria);
+        console.log(`Sizes loaded: ${tallas}`);
+        searchTallas.innerHTML = '';
+
+        tallas.forEach(talla => {
+            const li = document.createElement('li');
+            li.textContent = talla;
+            li.onclick = () => {
+                showProducts(categoria, talla);
+                document.getElementById('btns').classList.add('hidden');
+                document.getElementById('CarouselImg').classList.add('hidden');
+            };
+            searchTallas.appendChild(li);
+        });
+
+        document.getElementById('menu').classList.add('hidden');
+        document.getElementById('sizes').classList.add('show');
+    };
+
+    // Mostrar productos por categoría y talla
+    async function showProducts(categoria, talla) {
+    try {
+        const snapshot = await get(productosRef);
+        if (snapshot.exists()) {
+            const productos = snapshot.val();
+            sectionProductos.innerHTML = '';
+            sectionProductoId.textContent = categoria;
+
+            for (const key in productos) {
+                const producto = productos[key];
+                if (producto.Categoria === categoria && producto.Talla.includes(talla)) {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'item';
+
+                    // Obtener la imagen principal
+                    const mainImage = producto.Fotos.Item ? producto.Fotos.Item["Foto 1"] : "default-image-url";
+                    const altImage = producto.Fotos.Item ? producto.Fotos.Item["Foto 2"] : "default-image-url";
+
+                    const img = document.createElement('img');
+                    img.src = mainImage;
+                    img.alt = producto.Categoria;
+                    img.dataset.foto1 = mainImage;
+                    img.dataset.foto2 = altImage;
+                    img.onclick = () => toggleImage(img);
+
+                    const itemInfo = document.createElement('div');
+                    itemInfo.className = 'item-info';
+
+                    const itemName = document.createElement('p');
+                    itemName.className = 'item-name';
+                    itemName.textContent = truncateText(key, 20);  // Mostrar el nombre del producto truncado
+
+                    const itemPrice = document.createElement('p');
+                    itemPrice.className = 'item-price';
+                    itemPrice.textContent = `${producto.Precio}€`;
+
+                    const addToCartButton = document.createElement('button');
+                    addToCartButton.className = 'add-to-cart';
+                    addToCartButton.textContent = 'Añadir al carrito';
+
+                    itemInfo.appendChild(itemName);
+                    itemInfo.appendChild(itemPrice);
+                    itemInfo.appendChild(addToCartButton);
+
+                    itemDiv.appendChild(img);
+                    itemDiv.appendChild(itemInfo);
+
+                    sectionProductos.appendChild(itemDiv);
+                }
+            }
+
+            // Ocultar las secciones con IDs 'btns' y 'CarouselImg'
+            document.getElementById('btns').classList.add('hidden');
+            document.getElementById('CarouselImg').classList.add('hidden');
+        } else {
+            console.log("No data available");
+        }
+    } catch (error) {
+        console.error("Error fetching productos: ", error);
+    }
+}
+
+// Función para truncar el texto si supera el límite de caracteres
+function truncateText(text, maxLength) {
+    if (text.length > maxLength) {
+        return text.substring(0, maxLength) + '...';
+    }
+    return text;
+}
+
+
+    // Cambiar imagen al hacer clic
+    function toggleImage(imgElement) {
+        const foto1 = imgElement.dataset.foto1;
+        const foto2 = imgElement.dataset.foto2;
+        imgElement.src = imgElement.src === foto1 ? foto2 : foto1;
+    }
+</script>
+
+
+
+
+
+
+</body>
+
+</html>
